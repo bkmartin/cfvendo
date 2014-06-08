@@ -8,23 +8,32 @@ function getDocker(host, port) {
     });
 }
 
-function runImage(docker, image) {
-    pullImage(docker, image)
+function runImage(docker, containerOpts) {
+    return pullImage(docker, containerOpts.Image)
         .then(function() {
-            return createContainer(docker, image)
+            return createContainer(docker, containerOpts)
         })
         .then(function(container) {
             return inspectContainer(container)
                 .then(function(data) {
-                    return startContainer(container, data)
+                    startContainer(container, data)
+
+                    var ports = {}
+                    for (var port in data.HostConfig.PortBindings) {
+                        ports[port] = data.HostConfig.PortBindings[port][0].HostPort
+                    }
+
+                    return {
+                        "containerId": container.id,
+                        "ports": ports,
+                    }
                 })
         })
         .
     catch (function(err) {
-        console.log(err)
+        throw err;
     })
 }
-
 
 function pullImage(docker, image) {
     var deferred = Q.defer()
@@ -45,7 +54,7 @@ function pullImage(docker, image) {
     return deferred.promise
 }
 
-function createContainer(docker, image) {
+function createContainer(docker, containerOpts) {
 
     var ccopts = {
         'Hostname': '',
@@ -58,13 +67,13 @@ function createContainer(docker, image) {
         'StdinOnce': false,
         'Env': null,
         'Cmd': null,
-        'Image': image,
         'Volumes': {},
         'VolumesFrom': '',
-        "ExposedPorts": {
-            "7474/tcp": {}
-        },
     };
+
+    for (var k in containerOpts) {
+        ccopts[k] = containerOpts[k]
+    }
 
     var deferred = Q.defer()
     docker.createContainer(ccopts, function handler(err, container) {
