@@ -17,8 +17,11 @@ function runImage(docker, containerOpts) {
             return inspectContainer(container)
                 .then(function(data) {
                     return startContainer(container, data)
-                        .then(function() {
+                }).then(function(data) {
+                    return inspectContainer(container)
+                        .then(function(data) {
                             var ports = {}
+
                             for (var port in data.HostConfig.PortBindings) {
                                 ports[port] = data.HostConfig.PortBindings[port][0].HostPort
                             }
@@ -29,6 +32,7 @@ function runImage(docker, containerOpts) {
                             }
                         })
                 })
+
         })
         .
     catch (function(err) {
