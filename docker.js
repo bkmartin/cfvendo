@@ -16,7 +16,7 @@ function runImage(docker, containerOpts) {
         .then(function(container) {
             return inspectContainer(container)
                 .then(function(data) {
-                    startContainer(container, data)
+                    return startContainer(container, data)
                         .then(function() {
                             var ports = {}
                             for (var port in data.HostConfig.PortBindings) {
