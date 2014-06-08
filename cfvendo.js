@@ -201,11 +201,25 @@ function storeContainerId(containerId, instanceId) {
 
 function getContainerId(instanceId) {
    var deferred = q.defer();
-   db.get(instanceId, null, function(err, body) {
+   db.get(instanceId, {
+      revs_info: true
+   }, function(err, body) {
       if (err) {
          deferred.reject(new Error(err));
       } else {
          deferred.resolve(body);
+      }
+   });
+   return deferred.promise;
+}
+
+function destroyInstanceId(instanceId, rev) {
+   var deferred = q.defer();
+   db.destroy(instanceId, rev, function(err, body) {
+      if (err) {
+         deferred.reject(new Error(err));
+      } else {
+         deferred.resolve();
       }
    });
    return deferred.promise;
@@ -313,7 +327,10 @@ function unprovision(request, response) {
 
       getContainerId(instanceId)
          .then(function(data) {
-            docker.stopImage(DOCKER, data.containerId)
+            return docker.stopImage(DOCKER, data.containerId)
+               .then(function() {
+                  return destroyInstanceId(instanceId, data._rev)
+               })
          })
          .catch(function(error) {
             console.log('error %j', error);
