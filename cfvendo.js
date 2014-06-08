@@ -164,7 +164,8 @@ function catalog(request, response) {
       var myServices = [];
       for (var idx = 0; idx < servicesMetadata.length; idx++) {
          for (var key in servicesMetadata[idx].cloudfoundry.metadata) {
-            servicesMetadata[idx].cloudfoundry.metadata[key] = servicesMetadata[idx].cloudfoundry.metadata[key].replace('${brokerHost}',request.get('host'));
+            servicesMetadata[idx].cloudfoundry.metadata[key] = servicesMetadata[idx].cloudfoundry.metadata[key].replace('${brokerHost}',
+               request.get('host'));
          }
          myServices.push(servicesMetadata[idx].cloudfoundry);
       }
@@ -191,11 +192,9 @@ function generateDashboard(provisioning, ports) {
    return dashboard_url;
 }
 
-function storeContainerId(containerId, instanceId) {
+function storeContainerInfo(containerInfo, instanceId) {
    var deferred = q.defer();
-   db.insert({
-      'containerId': containerId
-   }, instanceId, function(err, body) {
+   db.insert(containerInfo,instanceId, function(err, body) {
       if (!err) {
          deferred.resolve(body);
       } else
@@ -204,7 +203,7 @@ function storeContainerId(containerId, instanceId) {
    return deferred.promise;
 }
 
-function getContainerId(instanceId) {
+function getContainerInfo(instanceId) {
    var deferred = q.defer();
    db.get(instanceId, {
       revs_info: true
@@ -250,7 +249,7 @@ function provision(request, response) {
       docker.runImage(DOCKER, dockerImageMap[serviceId]).then(function(containerInfo) {
          console.log('containerInfo %j', containerInfo);
          var dashboardUrl = generateDashboard(provisioningMap[serviceId], containerInfo.ports);
-         return storeContainerId(containerInfo.containerId, instanceId)
+         return storeContainerInfo(containerInfo, instanceId)
             .then(function(containerid) {
                var result = {
                   dashboard_url: dashboardUrl
@@ -262,7 +261,7 @@ function provision(request, response) {
                response.json(200, result); // Return 409 if already provisioned at this url
             })
       }).
-      catch(function(error) {
+      catch (function(error) {
          console.log('error %j', error);
          response.json(500, error);
       });
@@ -282,14 +281,20 @@ function bind(request, response) {
       var s = JSON.stringify(request.body);
       var json = JSON.parse(s);
       console.log("BIND body: %j", json);
-
-      var result = {
-         username: 'TODO',
-         password: 'TODO',
-         url: 'http://www.todo.com/'
-      };
-      console.log("BIND PUT result: %j", result);
-      response.json(200, result); // Return 409 if already provisioned at this url
+      var serviceId = json.service_id;
+      console.log("Bind PUT serviceId: " + serviceId);
+      getContainerInfo(instanceId).then(function(containerInfo) {
+         var binding = provisioningMap[serviceId].binding;
+         var host = url.parse(DOCKER_HOST).host
+         for (key in binding) {
+            binding[key] = binding[key].replace('${host}',host);
+            for (var x in containerInfo.ports) {
+               binding[key] = binding[key].replace('${' + x + '}', containerInfo.ports[x]);
+            }
+         }
+         console.log("BIND PUT result: %j", {'credentials': binding});
+         response.json(200, {'credentials': binding}); // Return 409 if already provisioned at this url
+      });
 
    } catch (exception) {
       console.log(exception);
@@ -330,17 +335,18 @@ function unprovision(request, response) {
 
       var result = {};
 
-      getContainerId(instanceId)
+      getContainerInfo(instanceId)
          .then(function(data) {
             return docker.stopImage(DOCKER, data.containerId)
                .then(function() {
                   return destroyInstanceId(instanceId, data._rev)
                })
          })
-         .catch(function(error) {
-            console.log('error %j', error);
-            response.json(500, error);
-         });
+         .
+      catch (function(error) {
+         console.log('error %j', error);
+         response.json(500, error);
+      });
 
       response.json(200, result); // Return 410 with body of {} if deleted
    } catch (exception) {
@@ -395,7 +401,7 @@ function sso_dashboard(request, response) {
             'password': accountInfo.password
          });
       }).
-      catch(function(error) {
+      catch (function(error) {
          response.json(401, 'Unauthorized');
       });
    } catch (exception) {

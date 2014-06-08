@@ -19,10 +19,10 @@
       "metadata": {
          "displayName": "Neo4j",
          "longDescription": "Neo4j is a highly scalable, robust (fully ACID) native graph database. Neo4j is used in mission-critical apps by thousands of leading startups, enterprises, and governments around the world.",
-         "smallImageUrl": "http://${brokerHost}/neo4j.png",
-         "mediumImageUrl": "http://${brokerHost}/neo4j.png",
-         "imageUrl": "http://${brokerHost}/neo4j.png",
-         "featuredImageUrl": "http://${brokerHost}/neo4j.png",
+         "smallImageUrl": "http://${brokerHost}/neo4jdocker.png",
+         "mediumImageUrl": "http://${brokerHost}/neo4jdocker.png",
+         "imageUrl": "http://${brokerHost}/neo4jdocker.png",
+         "featuredImageUrl": "http://${brokerHost}/neo4jdocker.png",
          "instructionsUrl": "http://${brokerHost}/neo4j.md"
       },
       "name": "neo4j",
@@ -37,8 +37,7 @@
          "name": "free"
       }]
    }
-},
-{
+}, {
    "id": "titandb",
    "docker": {
       "Image": "cncflora/titan",
@@ -59,11 +58,11 @@
       "metadata": {
          "displayName": "Titan DB",
          "longDescription": "Titan is a scalable graph database optimized for storing and querying graphs containing hundreds of billions of vertices and edges distributed across a multi-machine cluster. Titan is a transactional database that can support thousands of concurrent users executing complex graph traversals.",
-         "smallImageUrl": "http://${brokerHost}/titandb.png",
-         "mediumImageUrl": "http://${brokerHost}/titandb.png",
-         "imageUrl": "http://${brokerHost}/titandb.png",
-         "featuredImageUrl": "http://${brokerHost}/titandb.png",
-         "instructionsUrl": "http://${brokerHost}/titadb.md"
+         "smallImageUrl": "http://${brokerHost}/titandbdocker.png",
+         "mediumImageUrl": "http://${brokerHost}/titandbdocker.png",
+         "imageUrl": "http://${brokerHost}/titandbdocker.png",
+         "featuredImageUrl": "http://${brokerHost}/titandbdocker.png",
+         "instructionsUrl": "http://${brokerHost}/titandb.md"
       },
       "name": "titandb",
       "tags": ["data_management"],
@@ -77,5 +76,44 @@
          "name": "free"
       }]
    }
-}
-]
+}, {
+   "id": "couchdb",
+   "docker": {
+      "Image": "sbisbee/couchdb",
+      "ExposedPorts": {
+         "6984/tcp": {},
+         "5984/tcp": {}
+      }
+   },
+   "provisioning": {
+      "dashboard_url": "https://${host}:${6984/tcp}",
+      "binding": {
+         "url": "https://${host}:${6984/tcp}"
+      }
+   },
+   "cloudfoundry": {
+      "description": "CouchDB database as a service",
+      "id": "8ab85fd7-cabb-4879-a2b3-1625134752a2",
+      "bindable": true,
+      "metadata": {
+         "displayName": "CouchDB",
+         "longDescription": "CouchDB is a database that completely embraces the web. Store your data with JSON documents. Access your documents and query your indexes with your web browser, via HTTP. Index, combine, and transform your documents with JavaScript. CouchDB works well with modern web and mobile apps. You can even serve web apps directly out of CouchDB.",
+         "smallImageUrl": "http://${brokerHost}/couchdbdocker.png",
+         "mediumImageUrl": "http://${brokerHost}/couchdbdocker.png",
+         "imageUrl": "http://${brokerHost}/couchdbdocker.png",
+         "featuredImageUrl": "http://${brokerHost}/couchdbdocker.png",
+         "instructionsUrl": "http://${brokerHost}/couchdb.md"
+      },
+      "name": "couchdb",
+      "tags": ["data_management"],
+      "plans": [{
+         "description": "CouchDB Docker multi-tenant free trial account",
+         "free": true,
+         "id": "b0c212be-c21a-47a3-bd38-48a9c9cd311a",
+         "metadata": {
+            "plan": "free"
+         },
+         "name": "free"
+      }]
+   }
+}]
