@@ -1,34 +1,34 @@
 var Docker = require('dockerode');
-var Q = require('q')
+var Q = require('q');
 
-var docker2 = new Docker({
-    host: 'http://127.0.0.1',
-    port: 2375
-});
+function getDocker(host, port) {
+    return new Docker({
+        host: host,
+        port: port
+    });
+}
 
-var image = 'tpires/neo4j'
-
-
-pullImage(image)
-    .then(function() {
-        return createContainer(image)
+function runImage(docker, image) {
+    pullImage(docker, image)
+        .then(function() {
+            return createContainer(docker, image)
+        })
+        .then(function(container) {
+            return inspectContainer(container)
+                .then(function(data) {
+                    return startContainer(container, data)
+                })
+        })
+        .
+    catch (function(err) {
+        console.log(err)
     })
-    .then(function(container) {
-        return inspectContainer(container)
-            .then(function(data) {
-                return startContainer(container, data)
-            })
-
-    })
-    .
-catch (function(err) {
-    console.log(err)
-})
+}
 
 
-function pullImage(image) {
+function pullImage(docker, image) {
     var deferred = Q.defer()
-    docker2.pull(image, function(err, stream) {
+    docker.pull(image, function(err, stream) {
         if (err) {
             deferred.reject(err)
         } else {
@@ -45,7 +45,7 @@ function pullImage(image) {
     return deferred.promise
 }
 
-function createContainer(image) {
+function createContainer(docker, image) {
 
     var ccopts = {
         'Hostname': '',
@@ -67,7 +67,7 @@ function createContainer(image) {
     };
 
     var deferred = Q.defer()
-    docker2.createContainer(ccopts, function handler(err, container) {
+    docker.createContainer(ccopts, function handler(err, container) {
         if (err) {
             deferred.reject(err)
         } else {
@@ -114,5 +114,5 @@ function startContainer(container, data) {
     })
 }
 
-
-// kill
+module.exports.getDocker = getDocker;
+module.exports.runImage = runImage;

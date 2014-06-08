@@ -1,7 +1,9 @@
 {
   "brokerUser": "cfvendo",
-  "brokerPassword" :"PASSWORDS",
-  "apiHost" : "https://api.ng.bluemix.net",
-  "clientId" : "DockerVendo",
-  "clientSecret" : "PASSWORD"
+  "brokerPassword": "PASSWORDS",
+  "apiHost": "https://api.ng.bluemix.net",
+  "clientId": "DockerVendo",
+  "clientSecret": "PASSWORD",
+  "dockerHost": "http://127.0.0.1",
+  "dockerPort": 2375
 }
