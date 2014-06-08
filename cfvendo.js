@@ -194,10 +194,8 @@ function storeContainerId(containerid,instanceid) {
 
 function storeContainerId2(containerId,instanceId) {
    var deferred = q.defer();
-   db.insert(accountInfo, org_guid, function(err, body) {
+   db.insert({'containerId':containerId},instanceId, function(err, body) {
       if (!err) {
-         console.log('setaccountfororg success %j', org_guid);
-         console.log('setaccountfororg success %j', body);
          deferred.resolve(body);
       } else
          deferred.reject(new Error(err));
@@ -225,7 +223,7 @@ function provision(request, response) {
       docker.runImage(DOCKER, dockerImageMap[serviceId]).then(function(containerInfo) {
          console.log('containerInfo %j',containerInfo);
          var dashboardUrl = generateDashboard(provisioningMap[serviceId], containerInfo.ports);
-         return storeContainerId(containerInfo.containerId, instanceId)
+         return storeContainerId2(containerInfo.containerId, instanceId)
             .then(function(containerid) {
                var result = {
                   dashboard_url: dashboardUrl
@@ -406,7 +404,9 @@ function initialize() {
    CLIENT_ID = creds.clientId;
    CLIENT_SECRET = creds.clientSecret;
    DOCKER_HOST = creds.dockerHost;
-   DOCKER = docker.getDocker(creds.dockerHost, creds.dockerPort)
+   DOCKER = docker.getDocker(creds.dockerHost, creds.dockerPort);
+   db = require('nano')(creds.cloudantAccount);
+   console.log('%j',db);
 
    servicesMetadata = require(__dirname + "/services.json");
    createDockerImageMap();
