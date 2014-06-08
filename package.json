@@ -12,7 +12,10 @@
     "dockerode": ">= 1.3.0",
     "nano": ">= 5.10.0",
     "express": "*",
-    "node-uuid": "*"
+    "node-uuid": "*",
+    "q": "*",
+    "pretty-hrtime": "*",
+    "request": "*"
   },
   "engine": ">= node 0.10.28"
 }
