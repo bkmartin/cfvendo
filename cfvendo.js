@@ -188,7 +188,7 @@ function generateDashboard(provisioning, ports) {
 
 function storeContainerId(containerid,instanceid) {
    var deferred = q.defer();
-   q.resolve();
+   deferred.resolve(containerid);
    return deferred.promise;
 }
 
@@ -223,12 +223,10 @@ function provision(request, response) {
 
       console.log('provision %j', dockerImageMap[serviceId].Image);
       docker.runImage(DOCKER, dockerImageMap[serviceId]).then(function(containerInfo) {
-         console.log('%j',containerInfo);
-         console.log('%j',provisioningMap[serviceId]);
-         console.log('%j',containerInfo.ports);
+         console.log('containerInfo %j',containerInfo);
          var dashboardUrl = generateDashboard(provisioningMap[serviceId], containerInfo.ports);
-         storeContainerId(containerInfo.containerId, instanceId)
-            .then(function() {
+         return storeContainerId(containerInfo.containerId, instanceId)
+            .then(function(containerid) {
                var result = {
                   dashboard_url: dashboardUrl
                   //         dashboard_url: "https://" + request.get(
