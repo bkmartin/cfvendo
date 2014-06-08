@@ -32,7 +32,7 @@ function runImage(docker, containerOpts) {
         })
         .
     catch (function(err) {
-        throw err;
+        throw Error(err);
     })
 }
 
