@@ -17,16 +17,17 @@ function runImage(docker, containerOpts) {
             return inspectContainer(container)
                 .then(function(data) {
                     startContainer(container, data)
+                        .then(function() {
+                            var ports = {}
+                            for (var port in data.HostConfig.PortBindings) {
+                                ports[port] = data.HostConfig.PortBindings[port][0].HostPort
+                            }
 
-                    var ports = {}
-                    for (var port in data.HostConfig.PortBindings) {
-                        ports[port] = data.HostConfig.PortBindings[port][0].HostPort
-                    }
-
-                    return {
-                        "containerId": container.id,
-                        "ports": ports,
-                    }
+                            return {
+                                "containerId": container.id,
+                                "ports": ports,
+                            }
+                        })
                 })
         })
         .
