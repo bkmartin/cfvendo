@@ -178,7 +178,8 @@ function catalog(request, response) {
 };
 
 function generateDashboard(provisioning, ports) {
-   var dashboard_url = provisioning.dashboard_url.replace('${host}', DOCKER_HOST);
+   host = url.parse(DOCKER_HOST).host
+   var dashboard_url = provisioning.dashboard_url.replace('${host}', host);
    for (var x in ports) {
       dashboard_url = dashboard_url.replace('${' + x + '}', ports[x]);
    }
