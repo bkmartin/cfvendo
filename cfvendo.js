@@ -178,27 +178,35 @@ function catalog(request, response) {
 };
 
 function generateDashboard(provisioning, ports) {
-   var dashboard_url = provisioning.dashboard_url.replace('${host}',DOCKER_HOST);
+   var dashboard_url = provisioning.dashboard_url.replace('${host}', DOCKER_HOST);
    for (var x in ports) {
       dashboard_url = dashboard_url.replace('${' + x + '}', ports[x]);
    }
-   console.log('dashboard_url='+dashboard_url);
+   console.log('dashboard_url=' + dashboard_url);
    return dashboard_url;
 }
 
-function storeContainerId(containerid,instanceid) {
+function storeContainerId(containerId, instanceId) {
    var deferred = q.defer();
-   deferred.resolve(containerid);
-   return deferred.promise;
-}
-
-function storeContainerId2(containerId,instanceId) {
-   var deferred = q.defer();
-   db.insert({'containerId':containerId},instanceId, function(err, body) {
+   db.insert({
+      'containerId': containerId
+   }, instanceId, function(err, body) {
       if (!err) {
          deferred.resolve(body);
       } else
          deferred.reject(new Error(err));
+   });
+   return deferred.promise;
+}
+
+function getContainerId(instanceId) {
+   var deferred = q.defer();
+   db.get(instanceId, null, function(err, body) {
+      if (err) {
+         deferred.reject(new Error(err));
+      } else {
+         deferred.resolve(body);
+      }
    });
    return deferred.promise;
 }
@@ -221,9 +229,9 @@ function provision(request, response) {
 
       console.log('provision %j', dockerImageMap[serviceId].Image);
       docker.runImage(DOCKER, dockerImageMap[serviceId]).then(function(containerInfo) {
-         console.log('containerInfo %j',containerInfo);
+         console.log('containerInfo %j', containerInfo);
          var dashboardUrl = generateDashboard(provisioningMap[serviceId], containerInfo.ports);
-         return storeContainerId2(containerInfo.containerId, instanceId)
+         return storeContainerId(containerInfo.containerId, instanceId)
             .then(function(containerid) {
                var result = {
                   dashboard_url: dashboardUrl
@@ -235,12 +243,12 @@ function provision(request, response) {
                response.json(200, result); // Return 409 if already provisioned at this url
             })
       }).
-      catch (function(error) {
-         console.log('error %j',error);
+      catch(function(error) {
+         console.log('error %j', error);
          response.json(500, error);
       });
    } catch (exception) {
-      console.log('exception %j',exception);
+      console.log('exception %j', exception);
    }
 };
 
@@ -301,11 +309,16 @@ function unprovision(request, response) {
       console.log("Unprovision DELETE serviceId: " + serviceId);
       console.log("Unprovision DELETE planId: " + planId);
 
-      // TODO - Do your actual work here
-
       var result = {};
 
-      console.log("Unprovision DELETE result: %j", result);
+      getContainerId(instanceId)
+         .then(function(data) {
+            docker.stopImage(DOCKER, data.containerId)
+         })
+         .catch(function(error) {
+            console.log('error %j', error);
+            response.json(500, error);
+         });
 
       response.json(200, result); // Return 410 with body of {} if deleted
    } catch (exception) {
@@ -360,7 +373,7 @@ function sso_dashboard(request, response) {
             'password': accountInfo.password
          });
       }).
-      catch (function(error) {
+      catch(function(error) {
          response.json(401, 'Unauthorized');
       });
    } catch (exception) {
@@ -405,8 +418,8 @@ function initialize() {
    CLIENT_SECRET = creds.clientSecret;
    DOCKER_HOST = creds.dockerHost;
    DOCKER = docker.getDocker(creds.dockerHost, creds.dockerPort);
-   db = require('nano')(creds.cloudantAccount);
-   console.log('%j',db);
+   db = require('nano')(creds.couchDB);
+   console.log('%j', db);
 
    servicesMetadata = require(__dirname + "/services.json");
    createDockerImageMap();

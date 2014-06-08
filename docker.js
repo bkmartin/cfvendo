@@ -34,10 +34,20 @@ function runImage(docker, containerOpts) {
                 })
 
         })
-        .
-    catch (function(err) {
-        throw Error(err);
-    })
+        .catch(function(err) {
+            throw Error(err);
+        })
+}
+
+function stopImage(docker, containerId) {
+    container = docker.getContainer(containerId)
+    return stopContainer(container)
+        .then(function() {
+            return removeContainer(container)
+        })
+        .catch(function(err) {
+            throw Error(err);
+        })
 }
 
 function pullImage(docker, image) {
@@ -130,5 +140,32 @@ function startContainer(container, data) {
     return deferred.promise
 }
 
+function stopContainer(container) {
+    var deferred = Q.defer()
+    container.stop({
+        "t": 1
+    }, function(err, container) {
+        if (err) {
+            deferred.reject(err)
+        } else {
+            deferred.resolve()
+        }
+    })
+    return deferred.promise
+}
+
+function removeContainer(container) {
+    var deferred = Q.defer()
+    container.remove(function(err, container) {
+        if (err) {
+            deferred.reject(err)
+        } else {
+            deferred.resolve()
+        }
+    })
+    return deferred.promise
+}
+
 module.exports.getDocker = getDocker;
 module.exports.runImage = runImage;
+module.exports.stopImage = stopImage;
