@@ -162,8 +162,12 @@ function catalog(request, response) {
       var baseMetadataUrl = "https://" + request.get("host") + "/";
 
       var myServices = [];
-      for (var idx = 0; idx < servicesMetadata.length; idx++)
+      for (var idx = 0; idx < servicesMetadata.length; idx++) {
+         for (var key in servicesMetadata[idx].cloudfoundry.metadata) {
+            servicesMetadata[idx].cloudfoundry.metadata[key] = servicesMetadata[idx].cloudfoundry.metadata[key].replace('${brokerHost}',request.get('host'));
+         }
          myServices.push(servicesMetadata[idx].cloudfoundry);
+      }
 
       var result = {
          services: myServices

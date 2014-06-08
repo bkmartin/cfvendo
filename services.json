@@ -15,15 +15,15 @@
    "cloudfoundry": {
       "description": "Neo4j Graph database as a service",
       "id": "4f9c1e1ab-f55c-462c-98f1-ce3d250dd51d",
-      "bindable": "true",
+      "bindable": true,
       "metadata": {
          "displayName": "Neo4j",
          "longDescription": "Neo4j is a highly scalable, robust (fully ACID) native graph database. Neo4j is used in mission-critical apps by thousands of leading startups, enterprises, and governments around the world.",
-         "smallImageUrl": "neo4j24.png",
-         "mediumImageUrl": "neo4j32.png",
-         "imageUrl": "neo4j50.png",
-         "featuredImageUrl": "neo4j64.png",
-         "instructionsUrl": "neo4j.md"
+         "smallImageUrl": "http://${brokerHost}/neo4j.png",
+         "mediumImageUrl": "http://${brokerHost}/neo4j.png",
+         "imageUrl": "http://${brokerHost}/neo4j.png",
+         "featuredImageUrl": "http://${brokerHost}/neo4j.png",
+         "instructionsUrl": "http://${brokerHost}/neo4j.md"
       },
       "name": "neo4j",
       "tags": ["data_management"],
@@ -37,4 +37,45 @@
          "name": "free"
       }]
    }
-}]
+},
+{
+   "id": "titandb",
+   "docker": {
+      "Image": "cncflora/titan",
+      "ExposedPorts": {
+         "8182/tcp": {}
+      }
+   },
+   "provisioning": {
+      "dashboard_url": "http://${host}:${8182/tcp}",
+      "binding": {
+         "url": "http://${host}:${8182/tcp}"
+      }
+   },
+   "cloudfoundry": {
+      "description": "TitanDB Graph database as a service",
+      "id": "dc6bf17c-45a1-4e19-aea1-95af075cb94c",
+      "bindable": true,
+      "metadata": {
+         "displayName": "Titan DB",
+         "longDescription": "Titan is a scalable graph database optimized for storing and querying graphs containing hundreds of billions of vertices and edges distributed across a multi-machine cluster. Titan is a transactional database that can support thousands of concurrent users executing complex graph traversals.",
+         "smallImageUrl": "http://${brokerHost}/titandb.png",
+         "mediumImageUrl": "http://${brokerHost}/titandb.png",
+         "imageUrl": "http://${brokerHost}/titandb.png",
+         "featuredImageUrl": "http://${brokerHost}/titandb.png",
+         "instructionsUrl": "http://${brokerHost}/titadb.md"
+      },
+      "name": "titandb",
+      "tags": ["data_management"],
+      "plans": [{
+         "description": "TitanDB Docker multi-tenant free trial account",
+         "free": true,
+         "id": "50ca6b7b-d006-4753-b53a-160be14bdbd2",
+         "metadata": {
+            "plan": "free"
+         },
+         "name": "free"
+      }]
+   }
+}
+]
