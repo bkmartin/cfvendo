@@ -1,0 +1,34 @@
+[{
+   "id": "neo4j",
+   "docker": {
+      "image": "tpires/neo4j",
+      "ExposedPorts": {
+         "7474/tcp": {}
+      }
+   },
+   "cloudfoundry": {
+      "description": "Neo4j Graph database as a service",
+      "id": "4f9c1e1ab-f55c-462c-98f1-ce3d250dd51d",
+      "bindable":"true",
+      "metadata": {
+         "displayName": "Neo4j",
+         "longDescription": "Neo4j is a highly scalable, robust (fully ACID) native graph database. Neo4j is used in mission-critical apps by thousands of leading startups, enterprises, and governments around the world.",
+         "smallImageUrl": "neo4j24.png",
+         "mediumImageUrl": "neo4j32.png",
+         "imageUrl": "neo4j50.png",
+         "featuredImageUrl": "neo4j64.png",
+         "instructionsUrl": "neo4j.md"
+      },
+      "name": "neo4j",
+      "tags": ["data_management"],
+      "plans": [{
+         "description": "Neo4j Docker multi-tenant free trial account",
+         "free": true,
+         "id": "65706332-03c3-4825-96c1-036e862c76be",
+         "metadata": {
+            "plan": "free"
+         },
+         "name": "free"
+      }]
+   }
+}]

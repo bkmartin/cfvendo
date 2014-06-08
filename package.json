@@ -15,7 +15,10 @@
     "node-uuid": "*",
     "q": "*",
     "pretty-hrtime": "*",
-    "request": "*"
+    "request": "*",
+    "jade":"*",
+    "body-parser":"*",
+    "basic-auth":"*"
   },
   "engine": ">= node 0.10.28"
 }

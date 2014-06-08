@@ -1,0 +1,7 @@
+{
+  "brokerUser": "cfvendo",
+  "brokerPassword" :"PASSWORDS",
+  "apiHost" : "https://api.ng.bluemix.net",
+  "clientId" : "DockerVendo",
+  "clientSecret" : "PASSWORD"
+}
