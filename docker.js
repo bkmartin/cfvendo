@@ -122,6 +122,8 @@ function startContainer(container, data) {
             deferred.resolve(container)
         }
     })
+
+    return deferred.promise
 }
 
 module.exports.getDocker = getDocker;
